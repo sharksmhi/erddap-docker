@@ -31,7 +31,7 @@ For ERD releases, we use
 If you want to encourage all users to use https (not http), 
   make the baseUrl the same as the baseHttpsUrl (see below).
 -->
-<baseUrl>http://139.162.162.113:8080</baseUrl>
+<baseUrl>http://erddap.nodc.se</baseUrl>
 
 <!-- This is a variant of <baseUrl> which is used when 
 authentication is active and the user is logged in.
