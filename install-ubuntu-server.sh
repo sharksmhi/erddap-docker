@@ -45,12 +45,12 @@ if ! id "$admin_username" > /dev/null 2>&1; then
   sudo adduser "$admin_username" sudo
 fi
 
-# Disable root login for SSH (if enabled)
+# Disable root login with password for SSH (if enabled)
 if grep -Fq 'PermitRootLogin yes' /etc/ssh/sshd_config; then
   echo ""
   echo "Disabling root login for SSH ..."
   echo ""
-  sudo sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
+  sudo sed -i 's/PermitRootLogin yes/PermitRootLogin prohibit-password/g' /etc/ssh/sshd_config
   sudo service sshd restart
 fi
 
