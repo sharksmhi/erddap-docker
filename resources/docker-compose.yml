@@ -18,7 +18,7 @@ services:
       ERDDAP_baseUrl: http://erddap.nodc.se
       ERDDAP_baseHttpsUrl: http://erddap.nodc.se
       ERDDAP_flagKeyKey: change-this-value!!
-      ERDDAP_emailEverythingT: this+goes+nowhere@doesnotexist.ioos.us
+      ERDDAP_emailEverythingT:
       ERDDAP_emailDailyReportsTo:
       ERDDAP_emailFromAddress:
       ERDDAP_emailUserName:
@@ -26,14 +26,14 @@ services:
       ERDDAP_emailProperties:
       ERDDAP_emailSmtpHost:
       ERDDAP_emailSmtpPort:
-      ERDDAP_adminInstitution: Integrated Ocean Observing System (IOOS)
-      ERDDAP_adminInstitutionUrl: https://ioos.github.io/
-      ERDDAP_adminIndividualName: IOOS Data Manager
+      ERDDAP_adminInstitution: Swedish Meteorological and Hydrological Institute
+      ERDDAP_adminInstitutionUrl: https://www.nodc.se
+      ERDDAP_adminIndividualName: SMHI NODC
       ERDDAP_adminPosition: Data Manager
-      ERDDAP_adminPhone: "240-533-9444"
-      ERDDAP_adminAddress: "1315 East-West Highway 2nd Floor"
-      ERDDAP_adminCity: Silver Spring
-      ERDDAP_adminStateOrProvince: MD
-      ERDDAP_adminPostalCode: "20910"
-      ERDDAP_adminCountry: USA
-      ERDDAP_adminEmail: data.ioos@noaa.gov
+      ERDDAP_adminPhone: "+46 (0)11 495 80 00"
+      ERDDAP_adminAddress: "Göteborgseskaderns plats 3"
+      ERDDAP_adminCity: Västra Frölunda
+      ERDDAP_adminStateOrProvince: Västra Götalands Län
+      ERDDAP_adminPostalCode: "SE-421 71"
+      ERDDAP_adminCountry: Sweden
+      ERDDAP_adminEmail: nodc@smhi.se
