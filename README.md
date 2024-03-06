@@ -40,12 +40,13 @@ Copy the following files from `erddap-docker` to `erddap-gold-standard`:
 | Source                        | Destination                    |
 |-------------------------------|--------------------------------|
 | resources/docker-compose.yaml | docker-compose.yaml            |
-| resources/index.jsp           | erddap/conf/index.jsp
+| resources/config.sh           | erddap/conf/config.sh          |
+| resources/index.jsp           | erddap/conf/index.jsp          |
 | resources/datasets.xml        | erddap/content/datasets.xml    |
 | resources/smhi.png            | erddap/content/images/smhi.png |
 | resources/setup.xml           | erddap/content/setup.xml       |
 
-In `docker-compose.yaml` you should manually change the value for `ERDDAP_flagKeyKey`to any string value. The documentation recommends to use a phrase. This value is secret but you will not have to enter it somewhere else and it can be changed anytime.
+In `erddap/conf/config.sh` you should manually change the value for `ERDDAP_flagKeyKey`to any string value. The documentation recommends to use a phrase. This value is secret but you will not have to enter it somewhere else and it can be changed anytime.
 
 ### Using git when testing out configurations
 When experimenting with configurations, there is always a risk that you don't remembered what you have changed. Make use of the fact that all files are within git repositories.

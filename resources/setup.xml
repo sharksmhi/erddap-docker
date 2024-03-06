@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!-- setup.xml contains setup information for ERDDAP. 
 When you install ERDDAP on your server, many of the settings can be left as is.
 Settings that you MUST change are in this top section.
@@ -19,7 +19,7 @@ Subdirectories that will be created by ERDDAP are:
 The ERDDAP log file (log.txt) will be put in this directory.
 At ERD, we use '/u00/cwatch/erddap/' for releases.
 -->
-<bigParentDirectory>/erddapData/</bigParentDirectory>
+<bigParentDirectory></bigParentDirectory>
 
 <!-- baseUrl is the start of the public url, to which "/erddap" 
 is appended. For example:
@@ -31,7 +31,7 @@ For ERD releases, we use
 If you want to encourage all users to use https (not http), 
   make the baseUrl the same as the baseHttpsUrl (see below).
 -->
-<baseUrl>http://erddap.nodc.se</baseUrl>
+<baseUrl></baseUrl>
 
 <!-- This is a variant of <baseUrl> which is used when 
 authentication is active and the user is logged in.
@@ -64,7 +64,7 @@ See the email account settings below.
 Whether or not you set up the email system, all potential email messages 
 are logged to an emailLogYEAR-MONTH.txt file in [bigParentDirectory]/logs/.
 -->
-<emailEverythingTo>nobody@example.com</emailEverythingTo>
+<emailEverythingTo></emailEverythingTo>
 <!-- optional: 
 <emailDailyReportsTo>your.boss@yourInstitution.edu</emailDailyReportsTo>
 -->
@@ -109,7 +109,7 @@ and you are using anti-virus software (e.g., McAfee) make sure McAfee
 Anti Virus Standard Protections : 
 Prevent mass mailing worms from sending mail" is un-checked.
 -->
-<emailFromAddress>nobody@example.com</emailFromAddress>
+<emailFromAddress></emailFromAddress>
 <emailUserName></emailUserName>
 <emailPassword></emailPassword> 
 <emailProperties></emailProperties>
@@ -119,17 +119,17 @@ Prevent mass mailing worms from sending mail" is un-checked.
 
 <!-- Information about the ERDDAP administrator is used for the SOS and WMS 
 servers. -->
-<adminInstitution>ERDDAP Docker Test</adminInstitution>
-<adminInstitutionUrl>https://github.com/anloo/erddap-docker/</adminInstitutionUrl>
-<adminIndividualName>ERDDAP Docker Test</adminIndividualName>
-<adminPosition>Software Engineer</adminPosition>
-<adminPhone>555-555-5555</adminPhone>
-<adminAddress>123 Irrelevant Street</adminAddress>
-<adminCity>Nowhere</adminCity>
-<adminStateOrProvince>VA</adminStateOrProvince>
-<adminPostalCode>12345</adminPostalCode>
-<adminCountry>SE</adminCountry>
-<adminEmail>nobody@example.com</adminEmail>
+<adminInstitution></adminInstitution>
+<adminInstitutionUrl></adminInstitutionUrl>
+<adminIndividualName></adminIndividualName>
+<adminPosition></adminPosition>
+<adminPhone></adminPhone>
+<adminAddress></adminAddress>
+<adminCity></adminCity>
+<adminStateOrProvince></adminStateOrProvince>
+<adminPostalCode></adminPostalCode>
+<adminCountry></adminCountry>
+<adminEmail></adminEmail>
 
 <!-- Normally, if you have a EDDGridFromErddap or EDDTableFromErddap 
 dataset in your datasets.xml, it will try to subscribe to the remote 
@@ -153,14 +153,14 @@ See the fontFamily documentation on the ERDDAP setup.html#fonts web page. -->
 <!-- ERDDAP has a service that lets remote users set a flag
 to notify ERDDAP to try to reload a dataset.
 These requests use a key which is generated based
-on baseUrl/erddap, a datasetID, and flagKeyKey.
+on baseUrl/erddap, a datasetID, and flagKeyKey. 
 *** CHANGE THIS ONCE, to any text (a favorite quote? random text? Whatever you want.).
 Normally, you won't ever change this again.
 But if you you think someone is abusing the flag system,
 change this text again, restart ERDDAP, and send
 all of the users of the flag system the relevant new flagKeys
 (see the list in the Daily Report). -->
-<flagKeyKey>ERDDAP RALLY WROOM WROOM</flagKeyKey>
+<flagKeyKey></flagKeyKey>
 
 
 <!-- ******** End of MUST change settings.  ******************************** -->
