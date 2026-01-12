@@ -1,15 +1,35 @@
 version: "3"
 services:
-  erddap:
-    image: axiom/docker-erddap:2.23-jdk17-openjdk
-    restart: unless-stopped
-    ports:
-      - "80:8080"
+  fix-permissions:
+    image: axiom/docker-erddap:v2.28.1
+    user: "0:0"
+    command:
+      - /bin/bash
+      - -c
+      - |
+        set -eux
+        chmod -R a+rX /data || true
+        chmod -R a+rX /erddapData/hardFlag || true
     volumes:
-      - ./erddap/conf/robots.txt:/usr/local/tomcat/webapps/ROOT/robots.txt
-      - ./erddap/content:/usr/local/tomcat/content/erddap
-      - ./erddap/data:/erddapData
-      - ./datasets:/datasets
+      - ./data:/data:z
+      - ./erddapData:/erddapData:z
+    restart: "no"
+
+  erddap:
+    image: axiom/docker-erddap:v2.28.1
+    user: "${UID}:${GID}"
+    restart: unless-stopped
+    depends_on:
+      - fix-permissions
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - ./data:/data:z
+      - ./datasets.d:/datasets.d:z
+      - ./erddapData:/erddapData:z
+      - ./content:/usr/local/tomcat/content/erddap:z
+      - ./tomcatLogs:/usr/local/tomcat/logs:z
     environment:
       #note: these can also be set in /usr/local/tomcat/bin/config.sh
       ERDDAP_MIN_MEMORY: 2G
@@ -18,22 +38,22 @@ services:
       ERDDAP_baseUrl: http://erddap.nodc.se
       ERDDAP_baseHttpsUrl: http://erddap.nodc.se
       ERDDAP_flagKeyKey: change-this-value!!
-      ERDDAP_emailEverythingT: this+goes+nowhere@doesnotexist.ioos.us
-      ERDDAP_emailDailyReportsTo:
+      ERDDAP_emailEverythingTo:
+      ERDDAP_emailDailyReportTo:
       ERDDAP_emailFromAddress:
       ERDDAP_emailUserName:
       ERDDAP_emailPassword:
       ERDDAP_emailProperties:
       ERDDAP_emailSmtpHost:
       ERDDAP_emailSmtpPort:
-      ERDDAP_adminInstitution: Integrated Ocean Observing System (IOOS)
-      ERDDAP_adminInstitutionUrl: https://ioos.github.io/
-      ERDDAP_adminIndividualName: IOOS Data Manager
+      ERDDAP_adminInstitution: Swedish Meteorological and Hydrological Institute
+      ERDDAP_adminInstitutionUrl: https://www.nodc.se
+      ERDDAP_adminIndividualName: SMHI NODC
       ERDDAP_adminPosition: Data Manager
-      ERDDAP_adminPhone: "240-533-9444"
-      ERDDAP_adminAddress: "1315 East-West Highway 2nd Floor"
-      ERDDAP_adminCity: Silver Spring
-      ERDDAP_adminStateOrProvince: MD
-      ERDDAP_adminPostalCode: "20910"
-      ERDDAP_adminCountry: USA
-      ERDDAP_adminEmail: data.ioos@noaa.gov
+      ERDDAP_adminPhone: "+46 (0)11 495 80 00"
+      ERDDAP_adminAddress: "Göteborgseskaderns plats 3"
+      ERDDAP_adminCity: Västra Frölunda
+      ERDDAP_adminStateOrProvince: Västra Götalands Län
+      ERDDAP_adminPostalCode: "SE-421 71"
+      ERDDAP_adminCountry: Sweden
+      ERDDAP_adminEmail: nodc@smhi.se
