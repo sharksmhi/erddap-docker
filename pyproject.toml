@@ -1,0 +1,37 @@
+[project]
+name = "erddap-docker"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.3.1",
+    "lxml>=6.0.2",
+    "rich>=14.2.0",
+    "rich-click>=1.9.5",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.9",
+]
+
+[project.scripts]
+import-dataset-xml = "erddap_docker.import_dataset_xml:main"
+erddapcli = "erddap_docker.erddap_cli:cli"
+
+[tool.uv]
+package = true
+
+[tool.ruff]
+line-length = 90
+indent-width = 4
+target-version = "py314"
+
+[tool.ruff.lint]
+select = [
+    "A",  # flake8-builtins
+    "F",  # pyflakes
+    "E", # pycodestyle: error
+    "W",  # pycodestyle: warning
+    "I",  # isort
+    "RUF"  # Ruff-specific rules
+]
