@@ -1,10 +1,8 @@
-/resources/data
-/resources/datasets.d
-/resources/content/datasets.xml
-/resources/erddapData
-/resources/tomcatLogs
-
-
+/data
+/docker/datasets.d
+/docker/content/datasets.xml
+/docker/erddapData
+/docker/tomcatLogs
 
 # Bakups and logs
 *.bak

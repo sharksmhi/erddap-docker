@@ -1,0 +1,15 @@
+[Unit]
+Description=ERDDAP stack (Docker Compose)
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory={{ erddap_root }}/docker
+ExecStart=/usr/bin/docker compose up -d --remove-orphans
+ExecStop=/usr/bin/docker compose stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

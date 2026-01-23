@@ -8,35 +8,39 @@ services:
       - -c
       - |
         set -eux
-        chmod -R a+rX /data || true
-        chmod -R a+rX /erddapData/hardFlag || true
+        chmod -R 2775 /data || true
+        chmod -R 755 /erddapData/hardFlag || true
     volumes:
-      - ./data:/data:z
-      - ./erddapData:/erddapData:z
+      - ../data:/data
+      - ./erddapData:/erddapData
     restart: "no"
 
   erddap:
     image: axiom/docker-erddap:v2.28.1
-    user: "${UID}:${GID}"
+    user: "0:0"
     restart: unless-stopped
     depends_on:
       - fix-permissions
     ports:
-      - "8080:8080"
-      - "8443:8443"
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/erddap/index.html" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     volumes:
-      - ./data:/data:z
-      - ./datasets.d:/datasets.d:z
-      - ./erddapData:/erddapData:z
-      - ./content:/usr/local/tomcat/content/erddap:z
-      - ./tomcatLogs:/usr/local/tomcat/logs:z
+      - ../data:/data
+      - ./datasets.d:/datasets.d
+      - ./erddapData:/erddapData
+      - ./content:/usr/local/tomcat/content/erddap
+      - ./tomcatLogs:/usr/local/tomcat/logs
     environment:
       #note: these can also be set in /usr/local/tomcat/bin/config.sh
       ERDDAP_MIN_MEMORY: 2G
       ERDDAP_MAX_MEMORY: 12G
       ERDDAP_bigParentDirectory: /erddapData/
-      ERDDAP_baseUrl: http://erddap.nodc.se
-      ERDDAP_baseHttpsUrl: http://erddap.nodc.se
+      ERDDAP_baseUrl: https://erddap.nodc.se
+      ERDDAP_baseHttpsUrl: https://erddap.nodc.se
       ERDDAP_flagKeyKey: change-this-value!!
       ERDDAP_emailEverythingTo:
       ERDDAP_emailDailyReportTo:
@@ -57,3 +61,20 @@ services:
       ERDDAP_adminPostalCode: "SE-421 71"
       ERDDAP_adminCountry: Sweden
       ERDDAP_adminEmail: nodc@smhi.se
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - erddap
+
+volumes:
+  caddy_data:
+  caddy_config:

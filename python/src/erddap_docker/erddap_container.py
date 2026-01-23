@@ -14,14 +14,14 @@ from rich.panel import Panel
 
 from erddap_docker.errors import DatasetNotInRepoError, RepoNotFoundError
 
-CONTAINTER_MANAGER = "podman"
-CONTAINTER_COMPOSER = "podman-compose"
 ERDDAP_SERVICE = "erddap"
 ERDDAP_REPO_ENV_VAR = "ERDDAP_REPO_DIR"
+ERDDAP_CONTAINER_MANAGER_ENV_VAR = "ERDDAP_CONTAINER_MANAGER"
+ERDDAP_CONTAINER_COMPOSER_ENV_VAR = "ERDDAP_CONTAINER_COMPOSER"
 
 
 @lru_cache(maxsize=32)
-def get_repo_root(explicit_root: Path | None = None, env_var: str | None = None):
+def get_project_root(explicit_root: Path | None = None, env_var: str | None = None):
     if explicit_root:
         if not explicit_root.is_dir():
             raise RepoNotFoundError(
@@ -35,6 +35,10 @@ def get_repo_root(explicit_root: Path | None = None, env_var: str | None = None)
 
     if root_from_cwd := _locate_repo_root_from_cwd():
         return root_from_cwd
+
+    root_from_default_location = Path("/srv/erddap")
+    if root_from_default_location.is_dir():
+        return root_from_default_location
 
     raise RepoNotFoundError("Could not locate project root.")
 
@@ -54,7 +58,7 @@ def _get_repo_root_from_env(env_var: str | None) -> Path | None:
 def _locate_repo_root_from_cwd() -> Path | None:
     cwd = Path.cwd().resolve()
     for directory in (cwd, *cwd.parents):
-        potential_project_file = directory / "pyproject.toml"
+        potential_project_file = directory / "python" / "pyproject.toml"
         if potential_project_file.exists():
             with potential_project_file.open("rb") as project_file:
                 project_metadata = tomllib.load(project_file)
@@ -64,7 +68,7 @@ def _locate_repo_root_from_cwd() -> Path | None:
 
 
 def run_command(
-    command: list[str], capture: bool = False
+        command: list[str], capture: bool = False
 ) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         command,
@@ -76,12 +80,15 @@ def run_command(
 
 
 def run_command_in_service_container(
-    service: str, command: list[str], capture: bool = False
+        service: str, command: list[str], capture: bool = False
 ) -> str:
-    repo_root = get_repo_root()
-    compose_file = repo_root / "resources" / "docker-compose.yml"
+    repo_root = get_project_root()
+    compose_file = repo_root / "docker" / "docker-compose.yml"
+    container_composer = os.environ.get(
+        ERDDAP_CONTAINER_COMPOSER_ENV_VAR, "docker-compose"
+    )
     process = run_command(
-        [CONTAINTER_COMPOSER, "-f", str(compose_file), "exec", service, *command],
+        [container_composer, "-f", str(compose_file), "exec", service, *command],
         capture=capture,
     )
     return process.stdout or ""
@@ -119,17 +126,19 @@ def print_banner(message: str):
 
 
 def generate_dataset_xml(
-    target_directory: Path, file_pattern: str, dataset_type: str, verbose: bool = False
+        target_directory: Path, file_pattern: str, dataset_type: str,
+        verbose: bool = False
 ) -> str:
-    repo_root = get_repo_root()
-    data_dir = repo_root / "resources" / "data"
+    repo_root = get_project_root()
+    data_dir = repo_root / "data"
     if data_dir not in (target_directory, *target_directory.parents):
         raise DatasetNotInRepoError("Dataset not in ERDDAP data directory.")
 
+    container_manager = os.environ.get(ERDDAP_CONTAINER_MANAGER_ENV_VAR, "docker")
     flag_key = f"{datetime.datetime.now().timestamp():.0f}"
     default_input = ['""'] * 18
     podman_command = [
-        CONTAINTER_MANAGER,
+        container_manager,
         "run",
         "--rm",
         "-v",
@@ -148,7 +157,14 @@ def generate_dataset_xml(
     ]
 
     print_banner("Running GenerateDatasetsXml.sh inside separate container.")
-    process = run_command(podman_command, capture=True)
+    try:
+        process = run_command(podman_command, capture=True)
+    except subprocess.CalledProcessError as exc:
+        if exc.stderr:
+            print(exc.stderr)
+        if exc.stdout:
+            print(exc.stdout)
+        raise
     if process.stderr:
         print(process.stderr)
 
@@ -173,8 +189,8 @@ def request_update_of_dataset(dataset_id: str):
 
 
 def build_xml_and_trigger_update():
-    repo_root = get_repo_root()
-    datasets_d = repo_root / "resources" / "datasets.d"
+    repo_root = get_project_root()
+    datasets_d = repo_root / "docker" / "datasets.d"
 
     run_datasets_d_script()
     for dataset in datasets_d.glob("*.xml"):
@@ -188,18 +204,18 @@ def run_datasets_d_script():
 
 def get_dataset_info() -> defaultdict[Any, dict]:
     found_datasets = defaultdict(dict)
-    repo_root = get_repo_root()
+    repo_root = get_project_root()
 
     explicit_active_state = {"true": "active", "false": "deactivated"}
 
-    datasets_d = repo_root / "resources" / "datasets.d"
+    datasets_d = repo_root / "docker" / "datasets.d"
     for datasets_d_path in datasets_d.glob("*.xml"):
         for dataset in etree.parse(datasets_d_path).xpath("/dataset"):
             found_datasets[dataset.get("datasetID")]["datasets.d"] = (
                 explicit_active_state.get(dataset.get("active"), "-")
             )
 
-    datasets_xml = repo_root / "resources" / "content" / "datasets.xml"
+    datasets_xml = repo_root / "docker" / "content" / "datasets.xml"
     for dataset in etree.parse(datasets_xml).xpath("//dataset"):
         found_datasets[dataset.get("datasetID")]["datasets.xml"] = (
             explicit_active_state.get(dataset.get("active"), "-")
@@ -208,8 +224,8 @@ def get_dataset_info() -> defaultdict[Any, dict]:
 
 
 def activate_dataset(dataset_id: str):
-    repo_root = get_repo_root()
-    datasets_d = repo_root / "resources" / "datasets.d"
+    repo_root = get_project_root()
+    datasets_d = repo_root / "docker" / "datasets.d"
 
     for datasets_d_path in datasets_d.glob("*.xml"):
         tree = etree.parse(datasets_d_path)
@@ -231,8 +247,8 @@ def activate_dataset(dataset_id: str):
 
 
 def deactivate_dataset(dataset_id: str):
-    repo_root = get_repo_root()
-    datasets_d = repo_root / "resources" / "datasets.d"
+    repo_root = get_project_root()
+    datasets_d = repo_root / "docker" / "datasets.d"
 
     for datasets_d_path in datasets_d.glob("*.xml"):
         tree = etree.parse(datasets_d_path)
@@ -254,6 +270,6 @@ def deactivate_dataset(dataset_id: str):
 
 
 def relative_data_path(dataset_directory: Path):
-    repo_root = get_repo_root()
-    data_directory = repo_root / "resources" / "data"
+    repo_root = get_project_root()
+    data_directory = repo_root / "data"
     return Path("/data") / dataset_directory.absolute().relative_to(data_directory)

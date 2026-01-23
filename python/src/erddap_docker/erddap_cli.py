@@ -23,7 +23,7 @@ def cli():
 
 @cli.command(
     help="Generate dataset xml from data. "
-    "Saved to datasets.d unless output dir given or if dry run."
+         "Saved to datasets.d unless output dir given or if dry run."
 )
 @click.argument(
     "input_path",
@@ -50,13 +50,13 @@ def cli():
 @click.option("--dry-run", is_flag=True, help="Print the generated dataset.")
 @click.option("-v", "--verbose", is_flag=True, help="More verbose output.")
 def xml_from_data(
-    input_path: Path,
-    file_pattern: str,
-    config_path: Path,
-    output_dir: Path,
-    dry_run: bool,
-    datatype: str,
-    verbose: bool,
+        input_path: Path,
+        file_pattern: str,
+        config_path: Path,
+        output_dir: Path,
+        dry_run: bool,
+        datatype: str,
+        verbose: bool,
 ):
     if input_path.is_dir() and not file_pattern:
         sys.exit("Input path is a directory. Please specify a file pattern.")
@@ -95,8 +95,8 @@ def xml_from_data(
         print(dataset_xml)
     else:
         if not output_dir:
-            repo_root = erddap_container.get_repo_root()
-            output_dir = repo_root / "resources" / "datasets.d"
+            repo_root = erddap_container.get_project_root()
+            output_dir = repo_root / "docker" / "datasets.d"
         output_path = output_dir / input_path.with_suffix(".xml").name
         output_path.write_text(dataset_xml)
         print(f"Wrote dataset xml to '{output_path}'.")
@@ -141,7 +141,7 @@ def list_datasets():
         if "datasets.xml" in info:
             datasets_xml_cell = Text(
                 info["datasets.xml"],
-                style=active_state_to_color.get(info["datasets.d"], "white"),
+                style=active_state_to_color.get(info["datasets.xml"], "white"),
             )
         else:
             datasets_xml_cell = Text("-", style="white")

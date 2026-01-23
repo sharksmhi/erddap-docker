@@ -1,0 +1,82 @@
+---
+- name: Define uv users
+  ansible.builtin.set_fact:
+    uv_users: >-
+      {{
+        [admin_username]
+        + ([new_user | default('') | trim] if (new_user | default('') | trim | length > 0 and (new_user | default('') | trim) != admin_username) else [])
+      }}
+
+- name: Assert users exist before uv install
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ item }}"
+  loop: "{{ uv_users }}"
+
+- name: Download uv installer
+  ansible.builtin.get_url:
+    url: https://astral.sh/uv/install.sh
+    dest: /tmp/uv-install.sh
+    mode: "0755"
+  when: uv_users | length > 0
+
+- name: Install uv for configured users
+  become_user: "{{ item }}"
+  ansible.builtin.shell: "/tmp/uv-install.sh"
+  args:
+    executable: /bin/bash
+    creates: "/home/{{ item }}/.local/bin/uv"
+  loop: "{{ uv_users }}"
+
+- name: Check uv installation for configured users
+  ansible.builtin.stat:
+    path: "/home/{{ item }}/.local/bin/uv"
+  register: uv_install_stat
+  loop: "{{ uv_users }}"
+
+- name: Check project root for pyproject.toml
+  ansible.builtin.stat:
+    path: "{{ erddap_root }}/python/pyproject.toml"
+  register: uv_project_stat
+
+- name: Update uv for configured users (changed only when version updates)
+  become_user: "{{ item.item }}"
+  ansible.builtin.shell: |
+    set -euo pipefail
+    before=$(/home/{{ item.item }}/.local/bin/uv --version)
+    /home/{{ item.item }}/.local/bin/uv self update >/dev/null 2>&1
+    after=$(/home/{{ item.item }}/.local/bin/uv --version)
+    echo "before=${before}"
+    echo "after=${after}"
+  args:
+    executable: /bin/bash
+  register: uv_self_update
+  changed_when: >
+    (uv_self_update.stdout_lines | select('match', '^before=') | list | first | regex_replace('^before=', '')) !=
+    (uv_self_update.stdout_lines | select('match', '^after=') | list | first | regex_replace('^after=', ''))
+  check_mode: false
+  loop: "{{ uv_install_stat.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when: item.stat.exists
+
+- name: Install cli for configured users
+  become_user: "{{ item.item }}"
+  ansible.builtin.command: "/home/{{ item.item }}/.local/bin/uv tool install --no-cache --force ."
+  args:
+    chdir: "{{ erddap_cli_root }}"
+  loop: "{{ uv_install_stat.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when:
+    - item.stat.exists
+    - uv_project_stat.stat.exists
+
+- name: Ensure uv PATH is set for users
+  become_user: "{{ item }}"
+  ansible.builtin.lineinfile:
+    path: "/home/{{ item }}/.profile"
+    create: true
+    line: "{{ uv_path_line }}"
+    state: present
+  loop: "{{ uv_users }}"

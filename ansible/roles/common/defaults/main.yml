@@ -1,0 +1,11 @@
+---
+admin_username: erddap
+admin_extra_groups:
+  - sudo
+  - erddap-data
+
+user_groups:
+  - erddap-data
+  - docker
+
+ssh_permit_root_login: prohibit-password

@@ -1,69 +1,59 @@
 # ERDDAP Docker
 
-This repository contains the installation process and relevant configuration for the ERDDAP server hosted on
-http://erddap.nodc.se.
+This repository contains the complete toolchain for the ERDDAP server hosted on https://erddap.nodc.se. This includes:
+
+- Setting up the server environment (with Ansible).
+- A docker-compose solution for the ERDDAP server.
+- A CLI for handling data
 
 ## Installation
 
 ### Prerequisites
 
-#### Server
-
 The intended target for all instructions and scripts is a server running Ubuntu 22.04.4 LTS (Jammy Jellyfish).
 
-#### Cloning erddap-docker
+### Cloning erddap-docker
 
-Clone erddap-docker (this repository) on the server.
+Using the root user, clone this repository on the server as `/srv/erddap/`.
 
 Links:
 
 - https://github.com/sharksmhi/erddap-docker (the repository)
 
-##### Running the install script
+### Running the setup
 
-The script `install-ubuntu-server.se` does the following:
+The script `scripts/manage.sh setup` installs Ansible (with required community collections) and then runs the playbook
+in `ansible/`. The playbook does the following:
 
-- Creates an admin user an makes sure that it can't be logged in using password.
-- Enables the ufw firewall, disabling all incoming traffic except ssh, 2222, http and https.
-- Installs docker.
-- Installs docker-compose.
+- Creates the admin user `erddap` and makes sure that it can't be logged in using password.
+- Enables the ufw firewall, disabling all incoming traffic except ssh, http, and https.
+- Installs docker and docker-compose.
+- Installs a systemd service that makes sure that the docker-compose file in `/docker/` is always running.
 
-The script is partially idempotent, meaning it tries to skip steps already fulfilled and is therefore safe to run
-multiple times. E.g. if you already have a user with the name you supply the script, the script will just skip that
-step.
+At any point, the setup can be verified with the script `scripts/manage.sh sync` (use flag `--check` for a read-only
+dry run).
 
-However, the script will not change configurations if something is already configured. E.g. if you already have enabled
-ufw but with other rules, you will not get the expected ones by running the script.
+### Creating additional users
 
-It is advisable to manually check the result of each step afterwards.
+You can optionally create personal users that are allowed to add and manage data. This is
+done with:
 
-#### Cloning errdap-docker-gold-standard
+```console
+bash scripts/manage.sh add-user <username>
+```
 
-The U.S. Integrated Ocean Observing System Program (IOOS) has a guide for installing ERDDAP with Docker. This includes a
-GitHub repository with basic configurations.
+The created user will get the correct groups to manage data and also an installation of erdap-cli (see below).
 
-This repository will serve as the starting point for our installation but some configurations will be updated. To make
-sure everything works, you can try out the instructions without changes.
-
-Links:
-
-- https://ioos.github.io/erddap-gold-standard/ (the installation guide)
-- https://github.com/ioos/erddap-gold-standard (the repository)
+Note that the created user will not be able to log in using a password. The intended method is to add a public SSH key
+to the file `/home/USERNAME/.ssh/authorized_keys`. For an introduction to SSH keys, see section
+[Intro to using SSH keys](#intro-to-using-ssh-keys).
 
 ### Updating the configuration
 
-Copy the following files from `erddap-docker` to `erddap-gold-standard`:
+In `docker/docker-compose.yml` you should manually change the value for variables starting with "ERDDAP_".
 
-| Source                        | Destination                    |
-|-------------------------------|--------------------------------|
-| resources/datasets.xml        | erddap/content/datasets.xml    |
-| resources/setup.xml           | erddap/content/setup.xml       |
-| resources/smhi.png            | erddap/content/images/smhi.png |
-| resources/docker-compose.yaml | docker-compose.yaml            |
-
-In `docker-compose.yaml` you should manually change the value for `ERDDAP_flagKeyKey`to any string value. The
-documentation recommends to use a phrase. This value is secret but you will not have to enter it somewhere else and it
-can be changed anytime.
+Especially `ERDDAP_flagKeyKey` should be changed to any string value (the documentation recommends to use a phrase).
+This value is secret, but you will not have to enter it somewhere else and it can be changed anytime.
 
 #### Using git when testing out configurations
 
@@ -72,27 +62,15 @@ of the fact that all files are within git repositories.
 
 See which files and lines have been updated in a repository.
 
-```bash
+```console
 $ git diff
 ```
 
 Undo all local changes of a repository:
 
-```bash
+```console
 $ git reset --hard HEAD
 ```
-
-#### Run the server
-
-Start the server using docker-compose.
-
-```bash
-$ cd errdap-gold-standard
-$ docker-compose up -d
-```
-
-The `-d` flag makes the server run in the background. Omit the flag when troubleshooting and you will see all output in
-the terminal.
 
 ## Working with data
 
@@ -114,11 +92,77 @@ A directory called `/datasets.d` hosts individual XML files for each dataset. Wh
 `/init.d/50-datasets.d.sh` is called, all XML files are added to `datasets.xml`. Reloading of datasets must still be
 performed.
 
-### erddap-cli
+### erddapcli
 
-This project includes `erddap-cli` to simplify the above workflow. The script handles the following:
+This project includes `erddapcli` to simplify the above workflow. The tool handles the following:
 
 - Generate XML for a specific dataset and put it in `/datasets.d`.
 - Compile all XML files in `/datasets.d` and trigger update for each dataset.
 - List all datasets described by `datasets.xml` and in files in `/datasets.d`.
 - Change the attribute "active" for a specific dataset and trigger update.
+
+## Intro to using SSH keys
+
+SSH keys are a convenient way to authenticate to a server without having to enter a password. An SSH key is actually a
+pair, one public and one private key. The private key should never be shared with anyone, while the public key can be
+freely shared. Any server that has your public key associated with a user will accept authentication where you use your
+matching private key.
+
+### Generating a key pair
+
+Open a terminal (PowerShell on Windows) and run:
+
+```console
+ssh-keygen -t ed25519
+```
+
+Press Enter to accept the default location. Optionally set a passphrase.
+
+### Finding the public key locally
+
+The key pair is typically created in a directory named `.ssh` inside your home directory. For example:
+
+- `/home/<username>/.ssh/` (Linux)
+- `/Users/<username>/.ssh/` (macOS)
+- `C:\Users\<username>\.ssh\` (Windows)
+
+The public key ends with `.pub`.
+
+#### Linux and macOS
+
+Show the public key (from your home directory):
+
+```console
+cat .ssh/id_ed25519.pub
+```
+
+#### Windows
+
+Show the public key (from your home directory):
+
+```console
+type .ssh\id_ed25519.pub
+```
+
+### Add the public key to the server
+
+On the server, inside the desired user's home directory, add the public key to the file `.ssh/authorized_keys`. The key
+should be added on a new line. The username on the server doesn't have to match the username on your local computer.
+
+### Connecting to the server using the SSH key
+
+Once the public key has been added to the server, connect with:
+
+```console
+ssh <username>@erddap.nodc.se
+```
+
+As long as the private key is stored in the correct location, the key will automatically be used. If you have multiple
+keys, they will be tested one after another until one is accepted.
+
+If you store your key in a custom location or if you have keys for different users on the server, you can specify which
+one to use with the `-i` flag:
+
+```console
+ssh <username>@erddap.nodc.se -i my_erddap_key
+```

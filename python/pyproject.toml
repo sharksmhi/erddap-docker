@@ -9,13 +9,16 @@ dependencies = [
     "rich-click>=1.9.5",
 ]
 
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
+
 [dependency-groups]
 dev = [
     "ruff>=0.14.9",
 ]
 
 [project.scripts]
-import-dataset-xml = "erddap_docker.import_dataset_xml:main"
 erddapcli = "erddap_docker.erddap_cli:cli"
 
 [tool.uv]
@@ -28,10 +31,10 @@ target-version = "py314"
 
 [tool.ruff.lint]
 select = [
-    "A",  # flake8-builtins
-    "F",  # pyflakes
+    "A", # flake8-builtins
+    "F", # pyflakes
     "E", # pycodestyle: error
-    "W",  # pycodestyle: warning
-    "I",  # isort
+    "W", # pycodestyle: warning
+    "I", # isort
     "RUF"  # Ruff-specific rules
 ]
