@@ -1,0 +1,5 @@
+---
+ufw_allow_ports:
+  - { port: 22, proto: tcp }   # SSH
+  - { port: 80, proto: tcp }   # HTTP
+  - { port: 443, proto: tcp }  # HTTPS

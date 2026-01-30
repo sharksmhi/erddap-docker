@@ -1,0 +1,155 @@
+{
+  "dataset": {
+    "institution": "SMHI"
+  },
+  "data_variables": {
+    "time": {
+      "ioos_category": "Time",
+      "long_name": "Time (UTC)",
+      "standard_name": "time",
+      "time_precision": "1970-01-01T00:00:00.000Z",
+      "units": "yyyy-MM-dd HH:mm:ss.SSS",
+      "source_name": "time"
+    },
+    "pressure": {
+      "ioos_category": "Pressure",
+      "long_name": "Pressure",
+      "standard_name": "sea_water_pressure",
+      "units": "dbar"
+    },
+    "pump": {
+      "ioos_category": "Other",
+      "long_name": "Pump status (on/off)",
+      "units": "1",
+      "flag_values": "0 1",
+      "flag_meanings": "off on"
+    },
+    "T1": {
+      "ioos_category": "Temperature",
+      "long_name": "In situ temperature from first sensor pack",
+      "standard_name": "sea_water_temperature",
+      "units": "degree_Celsius"
+    },
+    "T2": {
+      "ioos_category": "Temperature",
+      "long_name": "In situ temperature from second sensor pack",
+      "standard_name": "sea_water_temperature",
+      "units": "degree_Celsius"
+    },
+    "S1": {
+      "ioos_category": "Salinity",
+      "long_name": "Practical salinity from first sensor pack",
+      "standard_name": "sea_water_practical_salinity",
+      "units": "1"
+    },
+    "S2": {
+      "ioos_category": "Salinity",
+      "long_name": "Practical salinity from second sensor pack",
+      "standard_name": "sea_water_practical_salinity",
+      "units": "1"
+    },
+    "OXY1_SAT": {
+      "ioos_category": "Dissolved O2",
+      "long_name": "Oxygen saturation from first sensor pack",
+      "units": "percent"
+    },
+    "OXY1_ML": {
+      "ioos_category": "Dissolved O2",
+      "long_name": "Oxygen concentration from first sensor pack",
+      "units": "ml/l"
+    },
+    "OXY2_SAT": {
+      "ioos_category": "Dissolved O2",
+      "long_name": "Oxygen saturation from second sensor pack",
+      "units": "percent"
+    },
+    "OXY2_ML": {
+      "ioos_category": "Dissolved O2",
+      "long_name": "Oxygen concentration from second sensor pack",
+      "units": "ml/l"
+    },
+    "FLUOR": {
+      "ioos_category": "Ocean Color",
+      "long_name": "Fluorescence, WET Labs ECO-AFL/FL",
+      "units": "mg m-3"
+    },
+    "TURB": {
+      "ioos_category": "Total Suspended Matter",
+      "long_name": "Turbidity, WET Labs ECO",
+      "units": "NTU"
+    },
+    "CDOM": {
+      "ioos_category": "Colored Dissolved Organic Matter",
+      "long_name": "Colored dissolved organic matter",
+      "units": "ppb"
+    },
+    "PAR": {
+      "ioos_category": "Optical Properties",
+      "long_name": "Downwelling Photosynthetic Photon Radiance In Sea Water",
+      "standard_name": "downwelling_photosynthetic_photon_radiance_in_sea_water"
+    },
+    "DESC": {
+      "ioos_category": "Other",
+      "long_name": "Descent rate",
+      "units": "m s-1"
+    },
+    "ALTIM": {
+      "ioos_category": "Bathymetry",
+      "long_name": "Distance above the seafloor",
+      "standard_name": "height_above_sea_floor",
+      "units": "m"
+    },
+    "CNT": {
+      "ioos_category": "Statistics",
+      "long_name": "Scan count",
+      "units": "count"
+    },
+    "T1_quality_flag": {
+      "ioos_category": "Quality",
+      "long_name": "Quality flags for temperature sensor 1",
+      "units": "1",
+      "flag_values": "0 1 2",
+      "flag_meanings": "good_data sketchy_data bad_data"
+    },
+    "T2_quality_flag": {
+      "ioos_category": "Quality",
+      "long_name": "Quality flags for temperature sensor 2",
+      "source_name": "T2_quality_flag",
+      "units": "1",
+      "flag_values": "0 1 2",
+      "flag_meanings": "good_data sketchy_data bad_data"
+    },
+    "S1_quality_flag": {
+      "ioos_category": "Quality",
+      "long_name": "Quality flag for salinity sensor 1",
+      "source_name": "S1_quality_flag",
+      "units": "1",
+      "flag_values": "0 1 2",
+      "flag_meanings": "good_data sketchy_data bad_data"
+    },
+    "S2_quality_flag": {
+      "ioos_category": "Quality",
+      "long_name": "Quality flag for salinity sensor 2",
+      "source_name": "S2_quality_flag",
+      "units": "1",
+      "flag_values": "0 1 2",
+      "flag_meanings": "good_data sketchy_data bad_data"
+    },
+    "OXY1_quality_flag": {
+      "ioos_category": "Quality",
+      "long_name": "Quality flag for oxygen sensor 1",
+      "source_name": "OXY1_quality_flag",
+      "units": "1",
+      "flag_values": "0 1 2",
+      "flag_meanings": "good_data sketchy_data bad_data"
+    },
+    "OXY2_quality_flag": {
+      "ioos_category": "Quality",
+      "long_name": "Quality flag for oxygen sensor 2",
+      "source_name": "OXY2_quality_flag",
+      "units": "1",
+      "flag_values": "0 1 2",
+      "flag_meanings": "good_data sketchy_data bad_data"
+    }
+  }
+}

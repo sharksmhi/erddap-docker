@@ -1,0 +1,10 @@
+# ---- Paths ----
+erddap_root: /srv/erddap
+erddap_cli_root: "{{ erddap_root }}/python/"
+erddap_docker_root: "{{ erddap_root }}/docker/"
+
+erddap_data_dir: "{{ erddap_root }}/data/"
+erddap_datasets_dir: "{{ erddap_docker_root }}/datasets.d/"
+
+# ---- Users ----
+new_user: ""

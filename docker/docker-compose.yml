@@ -1,0 +1,80 @@
+version: "3"
+services:
+  fix-permissions:
+    image: axiom/docker-erddap:v2.28.1
+    user: "0:0"
+    command:
+      - /bin/bash
+      - -c
+      - |
+        set -eux
+        chmod -R 2775 /data || true
+        chmod -R 755 /erddapData/hardFlag || true
+    volumes:
+      - ../data:/data
+      - ./erddapData:/erddapData
+    restart: "no"
+
+  erddap:
+    image: axiom/docker-erddap:v2.28.1
+    user: "0:0"
+    restart: unless-stopped
+    depends_on:
+      - fix-permissions
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/erddap/index.html" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - ../data:/data
+      - ./datasets.d:/datasets.d
+      - ./erddapData:/erddapData
+      - ./content:/usr/local/tomcat/content/erddap
+      - ./tomcatLogs:/usr/local/tomcat/logs
+    environment:
+      #note: these can also be set in /usr/local/tomcat/bin/config.sh
+      ERDDAP_MIN_MEMORY: 2G
+      ERDDAP_MAX_MEMORY: 12G
+      ERDDAP_bigParentDirectory: /erddapData/
+      ERDDAP_baseUrl: https://erddap.nodc.se
+      ERDDAP_baseHttpsUrl: https://erddap.nodc.se
+      ERDDAP_flagKeyKey: change-this-value!!
+      ERDDAP_emailEverythingTo:
+      ERDDAP_emailDailyReportTo:
+      ERDDAP_emailFromAddress:
+      ERDDAP_emailUserName:
+      ERDDAP_emailPassword:
+      ERDDAP_emailProperties:
+      ERDDAP_emailSmtpHost:
+      ERDDAP_emailSmtpPort:
+      ERDDAP_adminInstitution: Swedish Meteorological and Hydrological Institute
+      ERDDAP_adminInstitutionUrl: https://www.nodc.se
+      ERDDAP_adminIndividualName: SMHI NODC
+      ERDDAP_adminPosition: Data Manager
+      ERDDAP_adminPhone: "+46 (0)11 495 80 00"
+      ERDDAP_adminAddress: "Göteborgseskaderns plats 3"
+      ERDDAP_adminCity: Västra Frölunda
+      ERDDAP_adminStateOrProvince: Västra Götalands Län
+      ERDDAP_adminPostalCode: "SE-421 71"
+      ERDDAP_adminCountry: Sweden
+      ERDDAP_adminEmail: nodc@smhi.se
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - erddap
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,25 @@
+---
+- name: Ensure data dir exists
+  ansible.builtin.file:
+    path: "{{ erddap_data_dir }}"
+    state: directory
+    mode: "2775"
+
+- name: Ensure datasets.d dir exists
+  ansible.builtin.file:
+    path: "{{ erddap_datasets_dir }}"
+    state: directory
+    mode: "2775"
+
+- name: Install ERDDAP systemd service unit
+  ansible.builtin.template:
+    src: erddap.service.j2
+    dest: /etc/systemd/system/erddap.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Enable and start ERDDAP service
+  ansible.builtin.systemd:
+    name: erddap
+    enabled: true
+    state: started

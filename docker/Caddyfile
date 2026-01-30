@@ -1,0 +1,3 @@
+erddap.nodc.se {
+    reverse_proxy erddap:8080
+}

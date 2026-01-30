@@ -1,0 +1,14 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff von.
+    rev: v0.14.14
+    hooks:
+      # Run the linter.
+      - id: ruff
+        files: ^python/
+        args: [ --config, python/pyproject.toml ]
+      # Run the formatter.
+      - id: ruff-format
+        files: ^python/
+        args: [ --config, python/pyproject.toml ]
+

@@ -1,0 +1,6 @@
+---
+docker_repo_url: https://download.docker.com/linux/ubuntu
+docker_gpg_url: https://download.docker.com/linux/ubuntu/gpg
+
+# Last 16 hex of Docker apt signing key fingerprint
+docker_gpg_fingerprint_tail: "8D81803C0EBFCD88"

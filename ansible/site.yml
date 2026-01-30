@@ -1,0 +1,18 @@
+---
+- name: ERDDAP server setup
+  hosts: localhost
+  become: true
+  pre_tasks:
+    - name: Ensure python3-apt is installed
+      ansible.builtin.raw: |
+        test -e /usr/lib/python3/dist-packages/apt || (apt-get update && apt-get install -y python3-apt)
+      changed_when: false
+      when: not ansible_check_mode
+  vars_files:
+    - vars.yml
+  roles:
+    - common
+    - uv
+    - firewall
+    - docker
+    - erddap
