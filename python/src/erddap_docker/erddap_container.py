@@ -68,7 +68,7 @@ def _locate_repo_root_from_cwd() -> Path | None:
 
 
 def run_command(
-        command: list[str], capture: bool = False
+    command: list[str], capture: bool = False
 ) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         command,
@@ -80,7 +80,7 @@ def run_command(
 
 
 def run_command_in_service_container(
-        service: str, command: list[str], capture: bool = False
+    service: str, command: list[str], capture: bool = False
 ) -> str:
     repo_root = get_project_root()
     compose_file = repo_root / "docker" / "docker-compose.yml"
@@ -126,8 +126,7 @@ def print_banner(message: str):
 
 
 def generate_dataset_xml(
-        target_directory: Path, file_pattern: str, dataset_type: str,
-        verbose: bool = False
+    target_directory: Path, file_pattern: str, dataset_type: str, verbose: bool = False
 ) -> str:
     repo_root = get_project_root()
     data_dir = repo_root / "data"

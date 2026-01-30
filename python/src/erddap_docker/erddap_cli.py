@@ -23,7 +23,7 @@ def cli():
 
 @cli.command(
     help="Generate dataset xml from data. "
-         "Saved to datasets.d unless output dir given or if dry run."
+    "Saved to datasets.d unless output dir given or if dry run."
 )
 @click.argument(
     "input_path",
@@ -50,13 +50,13 @@ def cli():
 @click.option("--dry-run", is_flag=True, help="Print the generated dataset.")
 @click.option("-v", "--verbose", is_flag=True, help="More verbose output.")
 def xml_from_data(
-        input_path: Path,
-        file_pattern: str,
-        config_path: Path,
-        output_dir: Path,
-        dry_run: bool,
-        datatype: str,
-        verbose: bool,
+    input_path: Path,
+    file_pattern: str,
+    config_path: Path,
+    output_dir: Path,
+    dry_run: bool,
+    datatype: str,
+    verbose: bool,
 ):
     if input_path.is_dir() and not file_pattern:
         sys.exit("Input path is a directory. Please specify a file pattern.")
